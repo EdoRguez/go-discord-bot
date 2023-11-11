@@ -1,68 +1,20 @@
-package main
+package bot
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	Token string
-)
-
-const SteamAPIURL = "https://store.steampowered.com/api/featuredcategories/?l=english"
-
-type Steam struct {
-	Status string `json: "status"`
+type Bot struct {
+	Status int `json: "status"`
 }
 
-func init() {
-	flag.StringVar(&Token, "t", "MTE3MjMzNzg1MDQwMjk5NjIzNA.Gwlu7g.vGuLmdV5n2XVhGhEZj2GluPkOudEqLjTIoFuHY", "Bot Token")
-	flag.Parse()
-}
-
-func main() {
-	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + Token)
-	if err != nil {
-		fmt.Println("error creating Discord session,", err)
-		return
-	}
-
-	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate)
-
-	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.IntentsGuildMessages
-
-	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
-	if err != nil {
-		fmt.Println("error opening connection,", err)
-		return
-	}
-
-	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running. Press CTRL-C to exit.")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
-}
-
-// This function will be called (due to AddHandler above) every time a new
-// message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (b *Bot) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	// This isn't required in this specific example but it's a good practice.
@@ -112,8 +64,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "!gophers" {
 
-		fmt.Println(SteamAPIURL)
-
 		//Call the KuteGo API and display the list of available Gophers
 		response, err := http.Get(SteamAPIURL)
 		if err != nil {
@@ -127,22 +77,25 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			fmt.Println(body)
 
 			// Put only needed informations of the JSON document in our array of Gopher
-			var data []Steam
+			var data Steam
 			err = json.Unmarshal(body, &data)
 			if err != nil {
 				fmt.Println(err)
 			}
 
 			// Create a string with all of the Gopher's name and a blank line as separator
-			var gophers strings.Builder
-			for _, gopher := range data {
-				gophers.WriteString("Status = " + gopher.Status + "\n")
-			}
+			//var gophers strings.Builder
+			// for _, gopher := range data {
+			// 	gophers.WriteString("Status = " + gopher.Status + "\n")
+			// }
+
+			fmt.Println(data)
 
 			// Send a text message with the list of Gophers
-			_, err = s.ChannelMessageSend(m.ChannelID, gophers.String())
+			_, err = s.ChannelMessageSend(m.ChannelID, strconv.Itoa(data.Status))
 			if err != nil {
 				fmt.Println(err)
 			}
