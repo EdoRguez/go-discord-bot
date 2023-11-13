@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/EdoRguez/go-discord-bot/cmd/bot"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -20,7 +21,7 @@ func init() {
 }
 
 func main() {
-	bot := Bot{}
+	bot := bot.Bot{}
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + Token)
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(MessageCreate)
+	dg.AddHandler(bot.MessageCreate)
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
