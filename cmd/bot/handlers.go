@@ -74,7 +74,6 @@ func (b *Bot) MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println(body)
 
 			// Put only needed informations of the JSON document in our array of Gopher
 			var data steamapi.Steam
