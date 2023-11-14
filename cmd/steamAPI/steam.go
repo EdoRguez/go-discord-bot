@@ -1,15 +1,19 @@
 package steamapi
 
 type Steam struct {
-	Status   int `json: "status"`
-	Specials []Special
+	Specials Special
 }
 
 type Special struct {
-	Items []Item
+	Games []Game `json:"items"`
 }
 
-type Item struct {
-	Id   int    `json: "id"`
-	Name string `json: "name"`
+type Game struct {
+	Id              int    `json:"id"`
+	Name            string `json:"name"`
+	Discounted      bool   `json:"discounted"`
+	DiscountPercent int    `json:"discount_percent"`
+	OriginalPrice   int    `json:"original_price"`
+	FinalPrice      int    `json:"final_price"`
+	Currency        string `json:"currency"`
 }
