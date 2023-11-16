@@ -9,11 +9,12 @@ type Special struct {
 }
 
 type Game struct {
-	Id              int    `json:"id"`
-	Name            string `json:"name"`
-	Discounted      bool   `json:"discounted"`
-	DiscountPercent int    `json:"discount_percent"`
-	OriginalPrice   int    `json:"original_price"`
-	FinalPrice      int    `json:"final_price"`
-	Currency        string `json:"currency"`
+	Id                          int    `json:"id"`
+	Name                        string `json:"name"`
+	Discounted                  bool   `json:"discounted"`
+	DiscountPercent             int    `json:"discount_percent"`
+	OriginalPrice               int    `json:"original_price"`
+	FinalPrice                  int    `json:"final_price"`
+	Currency                    string `json:"currency"`
+	DiscountExpirationTimeStamp int64  `json:"discount_expiration"`
 }

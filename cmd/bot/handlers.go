@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	steamapi "github.com/EdoRguez/go-discord-bot/cmd/steamAPI"
+	"github.com/EdoRguez/go-discord-bot/pkg/util"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -34,9 +35,13 @@ func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		_, err = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%#v", data.Specials.Games[1].Name))
-		if err != nil {
-			fmt.Println(err)
+		for _, game := range data.Specials.Games {
+			message := util.FormatGameDiscountMessage(game)
+			_, err = s.ChannelMessageSend(m.ChannelID, message)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
+
 	}
 }

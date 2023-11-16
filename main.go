@@ -8,11 +8,13 @@ import (
 	"syscall"
 
 	"github.com/EdoRguez/go-discord-bot/cmd/bot"
+	"github.com/EdoRguez/go-discord-bot/pkg/db"
 	"github.com/bwmarrin/discordgo"
 )
 
 var (
-	Token string
+	Token       string
+	redisClient = db.NewRedisClient()
 )
 
 func init() {
