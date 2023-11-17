@@ -14,4 +14,7 @@ services:
     restart: always
     ports:
       - "6389:6379"
+    volumes:
+      - /home/pc/docker-projects/shaggy-discord-bot/data:/root/redis
+      - /home/pc/docker-projects/shaggy-discord-bot/redis.conf:/usr/local/etc/redis/redis.conf
 
