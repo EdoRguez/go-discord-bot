@@ -31,7 +31,7 @@ func GetSpecialGames() (*Steam, error) {
 		return data, nil
 
 	} else {
-		fmt.Println("Error: Can't get list of Gophers! :-(")
+		fmt.Println("Error: Couldn't retrieve Steam games list")
 		return nil, fmt.Errorf("error getting steam data: %d", response.StatusCode)
 	}
 }

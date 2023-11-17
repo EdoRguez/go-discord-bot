@@ -3,9 +3,14 @@ package bot
 import (
 	"fmt"
 
-	steamapi "github.com/EdoRguez/go-discord-bot/cmd/steamAPI"
-	"github.com/EdoRguez/go-discord-bot/pkg/util"
+	"github.com/EdoRguez/go-discord-bot/internal/cronjob"
 	"github.com/bwmarrin/discordgo"
+)
+
+var (
+	discordCronJob = cronjob.CronJob{
+		CronJob: cronjob.NewCronJob(),
+	}
 )
 
 func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -27,21 +32,12 @@ func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "!specials" {
-
-		data, err := steamapi.GetSpecialGames()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		for _, game := range data.Specials.Games {
-			message := util.FormatGameDiscountMessage(game)
-			_, err = s.ChannelMessageSend(m.ChannelID, message)
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-
+	switch m.Content {
+	case "!specials":
+		sendSpecials(s, m)
+	case "!specials-start":
+		startDailySpecials(s, m)
+	case "!specials-stop":
+		stopDailySpecials(s, m)
 	}
 }
