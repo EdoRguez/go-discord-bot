@@ -37,6 +37,7 @@ func (sp *Specials) SendSpecials(s *discordgo.Session, m *discordgo.MessageCreat
 
 func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 
+	// Every day at 5am
 	error := sp.discordCronJob.StartCronJob("0 5 * * *", func() {
 		storage := storage.NewStorage(sp.rc)
 

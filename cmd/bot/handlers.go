@@ -4,10 +4,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var sp = NewSpecials()
+var (
+	sp                    = NewSpecials()
+	defaultDiscordChannel = "1175188918791057528"
+)
 
 func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.ID == s.State.User.ID ||
+		m.ChannelID != defaultDiscordChannel {
 		return
 	}
 
@@ -17,7 +21,8 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.ID == s.State.User.ID ||
+		m.ChannelID != defaultDiscordChannel {
 		return
 	}
 
@@ -29,4 +34,5 @@ func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "!specials-stop":
 		sp.StopDailySpecials(s, m)
 	}
+
 }
