@@ -1,8 +1,6 @@
 package bot
 
 import (
-	"fmt"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -14,10 +12,7 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Content == "!help" {
-		_, err := s.ChannelMessageSend(m.ChannelID, "")
-		if err != nil {
-			fmt.Println(err)
-		}
+		SendHelp(s, m)
 	}
 }
 

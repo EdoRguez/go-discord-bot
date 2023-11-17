@@ -37,7 +37,7 @@ func (sp *Specials) SendSpecials(s *discordgo.Session, m *discordgo.MessageCreat
 
 func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	error := sp.discordCronJob.StartCronJob("@every 15s", func() {
+	error := sp.discordCronJob.StartCronJob("0 5 * * *", func() {
 		storage := storage.NewStorage(sp.rc)
 
 		if err := storage.CheckRedisConnection(); err != nil {

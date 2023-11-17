@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  shaggy-discord-bot:
+    build: .
+    container_name: shaggy-discord-bot
+    restart: always
+    environment: 
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+
+  redis:
+    image: redis
+    container_name: redis-shaggy-discord-bot
+    restart: always
+    ports:
+      - "6389:6379"
+

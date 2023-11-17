@@ -19,11 +19,11 @@ func FormatGameDiscountMessage(game steamapi.Game) string {
 
 	// Game New Price
 	newPrice := float32(game.FinalPrice) / float32(100)
-	result.WriteString(fmt.Sprintf("> - New Price         ⟶  **%.2f %s** \n", newPrice, game.Currency))
+	result.WriteString(fmt.Sprintf("> - New Price         ⟶  **%.2f USD** \n", newPrice))
 
 	// Game Original Price
 	originalPrice := float32(game.OriginalPrice) / float32(100)
-	result.WriteString(fmt.Sprintf("> - Original Price  ⟶  ~~%.2f %s~~ \n", originalPrice, game.Currency))
+	result.WriteString(fmt.Sprintf("> - Original Price  ⟶  ~~%.2f USD~~ \n", originalPrice))
 
 	// Game Discount Percentage
 	result.WriteString(fmt.Sprintf("> - Discount           ⟶  **%v%%** \n", game.DiscountPercent))
