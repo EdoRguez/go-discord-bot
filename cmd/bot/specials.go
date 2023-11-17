@@ -2,18 +2,23 @@ package bot
 
 import (
 	"fmt"
+	"strconv"
 
 	steamapi "github.com/EdoRguez/go-discord-bot/cmd/steamAPI"
+	"github.com/EdoRguez/go-discord-bot/internal/cronjob"
+	"github.com/EdoRguez/go-discord-bot/internal/storage"
 	"github.com/EdoRguez/go-discord-bot/pkg/db"
 	"github.com/EdoRguez/go-discord-bot/pkg/util"
 	"github.com/bwmarrin/discordgo"
+	"github.com/redis/go-redis/v9"
 )
 
-var (
-	rc = db.NewRedisClient()
-)
+type Specials struct {
+	rc             *redis.Client
+	discordCronJob cronjob.CronJob
+}
 
-func sendSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (sp *Specials) SendSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 	data, err := steamapi.GetSpecialGames()
 	if err != nil {
 		fmt.Println(err)
@@ -30,39 +35,53 @@ func sendSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func startDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
-	s.ChannelMessageSend(m.ChannelID, "> Daily Steam specials started")
+func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	error := discordCronJob.StartCronJob("@every 10s", func() {
+	error := sp.discordCronJob.StartCronJob("@every 15s", func() {
+		storage := storage.NewStorage(sp.rc)
 
-		s.ChannelMessageSend(m.ChannelID, "Hola")
-		// data, err := steamapi.GetSpecialGames()
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	return
-		// }
+		if err := storage.CheckRedisConnection(); err != nil {
+			s.ChannelMessageSend(m.ChannelID, "> Redis DB Connection Error")
+			return
+		}
 
-		// storage := storage.NewStorage(rc)
-		// for _, game := range data.Specials.Games {
+		data, err := steamapi.GetSpecialGames()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-		// 	if _, err := storage.GetRedis(strconv.Itoa(game.Id)); err != nil {
+		for _, game := range data.Specials.Games {
 
-		// 		message := util.FormatGameDiscountMessage(game)
-		// 		_, err = s.ChannelMessageSend(m.ChannelID, message)
-		// 		if err != nil {
-		// 			fmt.Println(err)
-		// 		}
+			if _, err := storage.GetRedis(strconv.Itoa(game.Id)); err != nil {
 
-		// 		storage.SaveRedis(strconv.Itoa(game.Id), game.Name)
-		// 	}
-		// }
+				message := util.FormatGameDiscountMessage(game)
+				_, err = s.ChannelMessageSend(m.ChannelID, message)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				storage.SaveRedis(strconv.Itoa(game.Id), game.Name)
+			}
+		}
 	})
 	if error != nil {
-		s.ChannelMessageSend(m.ChannelID, "> Daily Steam Specials is already running")
+		s.ChannelMessageSend(m.ChannelID, "> Daily Steam Specials is **ALREADY RUNNING**")
+		return
 	}
+	s.ChannelMessageSend(m.ChannelID, "> Daily Steam specials **STARTED**")
 }
 
-func stopDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
-	s.ChannelMessageSend(m.ChannelID, "> Daily Steam specials stopped")
-	discordCronJob.StopCronJobs()
+func (sp *Specials) StopDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
+	sp.discordCronJob.StopCronJobs()
+	s.ChannelMessageSend(m.ChannelID, "> Daily Steam specials **STOPPED**")
+}
+
+func NewSpecials() *Specials {
+	return &Specials{
+		rc: db.NewRedisClient(),
+		discordCronJob: cronjob.CronJob{
+			CronJob: cronjob.NewCronJob(),
+		},
+	}
 }

@@ -26,6 +26,14 @@ func (s *Storage) SaveRedis(key string, value string) error {
 	return s.clientRedis.Set(ctx, key, value, 168*time.Hour).Err()
 }
 
+func (s *Storage) CheckRedisConnection() error {
+	if err := s.clientRedis.Ping(ctx).Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewStorage(cr *redis.Client) *Storage {
 	return &Storage{
 		clientRedis: cr,

@@ -3,15 +3,10 @@ package bot
 import (
 	"fmt"
 
-	"github.com/EdoRguez/go-discord-bot/internal/cronjob"
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	discordCronJob = cronjob.CronJob{
-		CronJob: cronjob.NewCronJob(),
-	}
-)
+var sp = NewSpecials()
 
 func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
@@ -27,17 +22,16 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
-
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
 	switch m.Content {
 	case "!specials":
-		sendSpecials(s, m)
+		sp.SendSpecials(s, m)
 	case "!specials-start":
-		startDailySpecials(s, m)
+		sp.StartDailySpecials(s, m)
 	case "!specials-stop":
-		stopDailySpecials(s, m)
+		sp.StopDailySpecials(s, m)
 	}
 }
