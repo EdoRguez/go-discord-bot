@@ -35,14 +35,20 @@ func (sp *Specials) SendSpecials(s *discordgo.Session, m *discordgo.MessageCreat
 	}
 }
 
-func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate, defaultChannel string) {
+	var channelID string
+	if defaultChannel == "" {
+		channelID = m.ChannelID
+	} else {
+		channelID = defaultChannel
+	}
 
 	// Every day at 5am
 	error := sp.discordCronJob.StartCronJob("0 5 * * *", func() {
 		storage := storage.NewStorage(sp.rc)
 
 		if err := storage.CheckRedisConnection(); err != nil {
-			s.ChannelMessageSend(m.ChannelID, "> Redis DB Connection Error")
+			s.ChannelMessageSend(channelID, "> Redis DB Connection Error")
 			return
 		}
 
@@ -57,7 +63,7 @@ func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.Messag
 			if _, err := storage.GetRedis(strconv.Itoa(game.Id)); err != nil {
 
 				message := util.FormatGameDiscountMessage(game)
-				_, err = s.ChannelMessageSend(m.ChannelID, message)
+				_, err = s.ChannelMessageSend(channelID, message)
 				if err != nil {
 					fmt.Println(err)
 				}
@@ -67,10 +73,10 @@ func (sp *Specials) StartDailySpecials(s *discordgo.Session, m *discordgo.Messag
 		}
 	})
 	if error != nil {
-		s.ChannelMessageSend(m.ChannelID, "> Daily Steam Specials is **ALREADY RUNNING**")
+		s.ChannelMessageSend(channelID, "> Daily Steam Specials is **ALREADY RUNNING**")
 		return
 	}
-	s.ChannelMessageSend(m.ChannelID, "> Daily Steam specials **STARTED**")
+	s.ChannelMessageSend(channelID, "> Daily Steam specials **STARTED**")
 }
 
 func (sp *Specials) StopDailySpecials(s *discordgo.Session, m *discordgo.MessageCreate) {

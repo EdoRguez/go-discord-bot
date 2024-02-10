@@ -4,14 +4,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	sp                    = NewSpecials()
-	defaultDiscordChannel = "1175188918791057528"
-)
+type Handlers struct {
+	Specials       *Specials
+	DefaultChannel string
+}
 
-func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (h Handlers) Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID ||
-		m.ChannelID != defaultDiscordChannel {
+		m.ChannelID != h.DefaultChannel {
 		return
 	}
 
@@ -20,19 +20,18 @@ func Help(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (h Handlers) SteamSpecials(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID ||
-		m.ChannelID != defaultDiscordChannel {
+		m.ChannelID != h.DefaultChannel {
 		return
 	}
 
 	switch m.Content {
 	case "!specials":
-		sp.SendSpecials(s, m)
+		h.Specials.SendSpecials(s, m)
 	case "!specials-start":
-		sp.StartDailySpecials(s, m)
+		h.Specials.StartDailySpecials(s, m, "")
 	case "!specials-stop":
-		sp.StopDailySpecials(s, m)
+		h.Specials.StopDailySpecials(s, m)
 	}
-
 }
