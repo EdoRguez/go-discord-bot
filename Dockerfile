@@ -1,8 +1,5 @@
 FROM golang:1.21.0
 
-# Set necessary environmet variables needed for our image
-ENV DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
-
 # Move to working directory /build
 WORKDIR /build
 
