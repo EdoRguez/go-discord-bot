@@ -8,6 +8,9 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
+# Copy env file
+COPY .env .
+
 # Copy the code into the container
 COPY . .
 
