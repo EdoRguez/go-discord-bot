@@ -1,6 +1,6 @@
 FROM golang:1.21.0
 
-# Move to working directory /build
+# Move to work directory /build
 WORKDIR /build
 
 # Copy and download dependency using go mod
@@ -11,14 +11,14 @@ RUN go mod download
 # Copy the code into the container
 COPY . .
 
-# Copy env file
-COPY .env .
-
 # Build the application
 RUN go build -o main .
 
 # Move to /dist directory as the place for resulting binary folder
 WORKDIR /dist
+
+# Copy .env file to working directory
+COPY .env /dist
 
 # Copy binary from build to main folder
 RUN cp /build/main .
